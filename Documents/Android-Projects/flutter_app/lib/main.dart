@@ -3,6 +3,7 @@ import 'package:english_words/english_words.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_list_drag_and_drop/drag_and_drop_list.dart';
 import 'dart:math';
+import 'package:sqflite/sqflite.dart';
 
 void main() => runApp(new MyApp());
 
@@ -63,6 +64,15 @@ class myPageState extends State<myPage> {
      String imageToMove = items[data];
      items.removeAt(data);
      items.insert(index, imageToMove);
+
+     String txtDoneToMove = txtDDone[data];
+     txtDDone.removeAt(data);
+     txtDDone.insert(index, txtDoneToMove);
+
+     TextDecoration txtDecorationToMove = txtDList[data];
+     txtDList.removeAt(data);
+     txtDList.insert(index, txtDecorationToMove);
+
     try {
       prefs = await SharedPreferences.getInstance();
       prefs.setStringList("items", items);
@@ -313,6 +323,10 @@ class myPageState extends State<myPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(
+          leading: new IconButton(icon: const Icon(Icons.home), onPressed: () {
+
+          },
+            color: Colors.white,),
           title: Text('ToDo List'),
           backgroundColor: Colors.green,
           centerTitle: true,
