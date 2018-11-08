@@ -83,13 +83,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_list_drag_and_drop:
-    dependency: "direct main"
-    description:
-      name: flutter_list_drag_and_drop
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.5"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -222,12 +215,19 @@ packages:
     source: hosted
     version: "1.0.4"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.6.2"
+  path_provider:
+    dependency: "direct main"
+    description:
+      name: path_provider
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.1"
   plugin:
     dependency: transitive
     description:
