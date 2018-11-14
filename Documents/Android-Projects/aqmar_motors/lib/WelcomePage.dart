@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'globals.dart' as globals;
 import 'package:aqmar_motors/vehicleDetail.dart';
 
-
 class Welcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -30,8 +29,6 @@ class WelcomePageState extends State<WelcomePage> {
   void initState() {
     super.initState();
     print("globals.isLoggedIn: ${globals.isLoggedIn}");
-    //items.add('1');
-    //items.add('2');
     initConnectivity();
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
@@ -46,7 +43,6 @@ class WelcomePageState extends State<WelcomePage> {
           );
         });
   }
-
 
   @override
   void dispose() {
@@ -98,9 +94,6 @@ class WelcomePageState extends State<WelcomePage> {
           title: new Center(
             child: new Text("Alert"),
           ),
-          /*content: new Center(
-              child: new Text("Incorrect or blank email"),
-            ),*/
           content: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -111,13 +104,11 @@ class WelcomePageState extends State<WelcomePage> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
-
                   ),
                 ),
               )
             ],
           ),
-
           actions: <Widget>[
             new FlatButton(
               child: new Text("OK"),
@@ -157,9 +148,6 @@ class WelcomePageState extends State<WelcomePage> {
                     backgroundColor: Colors.white,
                     child: new Text('UN')
                 ),
-
-
-
               ),
               /*new DrawerHeader(
                 child: new Text("DRAWER HEADER.."),
@@ -172,7 +160,6 @@ class WelcomePageState extends State<WelcomePage> {
                 child: new ListView.builder(
                   itemCount: globals.userCarDocumentId.length,
                   itemBuilder: (BuildContext context, int index) {
-                    //return new Text('Item $index');
                     return ListTile(
                       title: Text('${globals.vehicleName[index]}', style: TextStyle(
                           color: Colors.white,
@@ -180,15 +167,6 @@ class WelcomePageState extends State<WelcomePage> {
                       ), ),
                       onTap: () {
                         Navigator.pop(context);
-                        /*Navigator.push(context, new MaterialPageRoute(
-                          builder: (BuildContext context) => new VehicleDetail(globals.vehicleName[index].toString(),globals.vehicleYear[index].toString(),
-                              globals.vehicleType[index].toString(),globals.vehicleCountry[index].toString(),globals.vehicleDU[index].toString(),
-                              globals.vehicleEngine[index].toString(),globals.vehicleFT[index].toString(),globals.vehicleFU[index].toString(),
-                              globals.vehicleIP[index].toString(),globals.vehicleLP[index].toString(),globals.vehicleMake[index].toString(),
-                              globals.vehicleModel[index].toString(),globals.vehicleNote[index].toString(),globals.vehicleSubModel[index].toString(),
-                              globals.vehicleTP[index].toString(),globals.vehicleTS[index].toString(),globals.vehicleTC[index].toString(),
-                              globals.vehicleTransmission[index].toString(),globals.userCarDocumentId[index].toString(),index),
-                        ));*/
                         Navigator.push(context, new MaterialPageRoute(
                           builder: (BuildContext context) => new VehicleDetail(index),
                         ));
@@ -310,23 +288,18 @@ class WelcomePageState extends State<WelcomePage> {
                 ],
               ),
             ],
-
           ),
         ),
       ),
-
       //drawer: new DrawerOnly(),
       appBar: new AppBar(
-        /*leading: new IconButton(icon: const Icon(Icons.power_settings_new), onPressed: () {
-          Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic> route) => false);
-        }),*/
         centerTitle: true,
         title: new Text('Welcome'),
         backgroundColor: Colors.red,
         actions: <Widget>[
           new IconButton(icon: const Icon(Icons.add), onPressed: () {
             goToAddVehicleScreen();
-          }, tooltip: "Add New vehicle",),
+          }),
           new IconButton(icon: const Icon(Icons.power_settings_new), onPressed: () {
             Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic> route) => false);
           }),
@@ -344,47 +317,22 @@ class WelcomePageState extends State<WelcomePage> {
           ),
           new Expanded(
             child: ListView.builder(
-          //itemCount: snapshot.data.documents.length,
-
-              itemCount: globals.userCarDocumentId.length,
-              itemBuilder: (context, index)
-            {
-
-      return ListTile(
-      /*title:
-                        Text('${items[index]}', style: TextStyle(color: Colors.black, fontSize: 16.0), ),*/
-      title: Text('${globals.vehicleName[index]}'),
-      onTap: () {
-       // Navigator.
-        print("index= ${index}");
-
-        Navigator.push(context, new MaterialPageRoute(
+             itemCount: globals.userCarDocumentId.length,
+              itemBuilder: (context, index){
+                return ListTile(
+               title: Text('${globals.vehicleName[index]}'),
+                  onTap: () {
+         Navigator.push(context, new MaterialPageRoute(
           builder: (BuildContext context) => new VehicleDetail(index),
         ));
-        /*Navigator.push(context, new MaterialPageRoute(
-          builder: (BuildContext context) => new VehicleDetail(globals.vehicleName[index].toString(),globals.vehicleYear[index].toString(),
-          globals.vehicleType[index].toString(),globals.vehicleCountry[index].toString(),globals.vehicleDU[index].toString(),
-          globals.vehicleEngine[index].toString(),globals.vehicleFT[index].toString(),globals.vehicleFU[index].toString(),
-          globals.vehicleIP[index].toString(),globals.vehicleLP[index].toString(),globals.vehicleMake[index].toString(),
-          globals.vehicleModel[index].toString(),globals.vehicleNote[index].toString(),globals.vehicleSubModel[index].toString(),
-          globals.vehicleTP[index].toString(),globals.vehicleTS[index].toString(),globals.vehicleTC[index].toString(),
-          globals.vehicleTransmission[index].toString(),globals.userCarDocumentId[index].toString(),index),
-        ));*/
       },
-      /*onTap: () {
-                          print('${items[index]}');
-                        },*/
       );
       },
     ),
     ),
-
-
-
-        ],
+   ],
       ),
     );
-
   }
 }
 

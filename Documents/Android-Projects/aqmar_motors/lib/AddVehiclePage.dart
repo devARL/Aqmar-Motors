@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'globals.dart' as globals;
+import 'package:connectivity/connectivity.dart';
+import 'package:flutter/services.dart';
 
 class AddVehicle extends StatelessWidget {
   @override
@@ -33,7 +35,6 @@ class AddVehiclePageState extends State<AddVehiclePage> {
 
   final String url = 'https://raw.githubusercontent.com/arthurkao/vehicle-make-model-data/master/json_data.json';
 
-
   /*List<String> maker = ["2000","2001","2002","2003","2004","2005","2006","2007",
   "2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
   "2018","2019",];*/
@@ -55,29 +56,6 @@ class AddVehiclePageState extends State<AddVehiclePage> {
   List<String> ft = ["Odometer","Trip Distance"];
   List<String> trk = ["Yes","No"];
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    vinController.dispose();
-    super.dispose();
-  }
-
-  void makeMaker(){
-    List<String> m = [];
-
-    if (yearval == "2000") {
-      m = ["Acura","Toyata","Suzuki","Honda"];
-    }
-    else {
-      m = ["No Model"];
-    }
-    makerList = [];
-    makerList = m.map((val) => new DropdownMenuItem<String>(
-        child: new Text(val), value: val,
-    )).toList();
-  }
-
-
   List<DropdownMenuItem<String>> yearList = [];
   List<DropdownMenuItem<String>> makerList = [];
   List<DropdownMenuItem<String>> typeList = [];
@@ -89,7 +67,55 @@ class AddVehiclePageState extends State<AddVehiclePage> {
   List<DropdownMenuItem<String>> ftList = [];
   List<DropdownMenuItem<String>> trkList = [];
 
+  final nameController = TextEditingController();
+  final vinController = TextEditingController();
 
+  String yearval = null;
+  String makerVal = null;
+  String typeVal = null;
+  String engVal = null;
+  String transVal = null;
+  String cntryVal = null;
+  String duVal = null;
+  String fuVal = null;
+  String ftVal = null;
+  String trkVal = null;
+
+  List<DocumentSnapshot> documents = null;
+  final Connectivity _connectivity = Connectivity();
+
+
+  var dct = {"2000":[{"aurora":["1","2"]},{"toyota":["1","2"]}],
+    "2001":[{"auroa":["3","4"]},{"toyota":["2","5"]}],
+    "2002":[{"honda":["2","23"]},{"toyota":["1","2"]}]};
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+    // getSWData();
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    vinController.dispose();
+    super.dispose();
+  }
+
+  void makeMaker(){
+    List<String> m = [];
+    if (yearval == "2000") {
+      m = ["Acura","Toyata","Suzuki","Honda"];
+    }
+    else {
+      m = ["No Model"];
+    }
+    makerList = [];
+    makerList = m.map((val) => new DropdownMenuItem<String>(
+        child: new Text(val), value: val,
+    )).toList();
+  }
 
   void loadData() {
     yearList = [];
@@ -133,65 +159,128 @@ class AddVehiclePageState extends State<AddVehiclePage> {
       child: new Text(val), value: val,)).toList();
  }
 
-  final nameController = TextEditingController();
-  final vinController = TextEditingController();
-
-  String yearval = null;
-  String makerVal = null;
-  String typeVal = null;
-  String engVal = null;
-  String transVal = null;
-  String cntryVal = null;
-  String duVal = null;
-  String fuVal = null;
-  String ftVal = null;
-  String trkVal = null;
-
-
-   List<DocumentSnapshot> documents = null;
-
-  var dct = {"2000":[{"aurora":["1","2"]},{"toyota":["1","2"]}],
-              "2001":[{"auroa":["3","4"]},{"toyota":["2","5"]}],
-              "2002":[{"honda":["2","23"]},{"toyota":["1","2"]}]};
-
-  Future<Null> addVeh() async {
-    globals.carAdded += 1;
-
-    await Firestore.instance.collection('user').document(globals.userDocumentId).updateData({"carAdded": globals.carAdded});
-   // globals.userCarDocumentId.add(documents[0]);
-
-
-    final QuerySnapshot numberOfUsers = await Firestore.instance.collection('vehicle').getDocuments();
-    var list = numberOfUsers.documents;
-    print('length: ${list.length}');
-    print('length + 1 ${list.length + 1}');
-
-
-    Firestore.instance.runTransaction((Transaction transaction) async {
-      CollectionReference reference =
-      Firestore.instance.collection('vehicle');
-      await reference.add({"id": list.length + 1, "country": cntryVal, "distance_unit": duVal, "engine": engVal, "fuel_tracking": ftVal, "fuel_unit": fuVal,
-        "insurance_policy": "", "license_plate": "", "make": makerVal, "type": typeVal, "model": "", "name": nameController.text, "sub_model": "",
-        "tire_pressure": "", "tire_size": "", "track_city": trkVal, "transmission": transVal, "user_id": globals.userId, "vehicle_note": "",
-        "vehicle_type": typeVal, "year": yearval});
+  void _onLoading() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      child: new Dialog(
+        child: new Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            new CircularProgressIndicator(),
+            new Text("Loading"),
+          ],
+        ),
+      ),
+    );
+    new Future.delayed(new Duration(seconds: 1), () {
+      Navigator.pop(context); //pop dialog
+      //_login();
+      addVeh();
     });
-
-    final QuerySnapshot numberOfUsers1 = await Firestore.instance.collection('vehicle').getDocuments();
-    var list1 = numberOfUsers1.documents;
-
-    documents = numberOfUsers1.documents;
-
-    print("${documents[0].documentID}");
-
-    globals.userCarDocumentId.add(documents[0].documentID);
-    globals.vehicleName.add(nameController.text);
-
-
   }
 
+  void _showDiaglog(String txt) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Center(
+            child: new Text("Alert"),
+          ),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children : <Widget>[
+              Expanded(
+                child: Text(
+                  txt,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+              )
+            ],
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
+  void addVeh() async {
 
-  Future<String> getSWData() async {
+    String connectionStatus;
+    try {
+      connectionStatus = (await _connectivity.checkConnectivity()).toString();
+      if (connectionStatus == "ConnectivityResult.wifi" ||
+          connectionStatus == "ConnectivityResult.mobile") {
+
+        globals.carAdded += 1;
+
+        await Firestore.instance.collection('user').document(globals.userDocumentId).updateData({"carAdded": globals.carAdded});
+
+        final QuerySnapshot numberOfUsers = await Firestore.instance.collection('vehicle').getDocuments();
+        var list = numberOfUsers.documents;
+        print('length: ${list.length}');
+        print('length + 1 ${list.length + 1}');
+
+        Firestore.instance.runTransaction((Transaction transaction) async {
+          CollectionReference reference =
+          Firestore.instance.collection('vehicle');
+          await reference.add({"id": list.length + 1, "country": cntryVal, "distance_unit": duVal, "engine": engVal, "fuel_tracking": ftVal, "fuel_unit": fuVal,
+            "insurance_policy": "", "license_plate": "", "make": makerVal, "type": typeVal, "model": "", "name": nameController.text, "sub_model": "",
+            "tire_pressure": "", "tire_size": "", "track_city": trkVal, "transmission": transVal, "user_id": globals.userId, "vehicle_note": "",
+            "vehicle_type": typeVal, "year": yearval});
+        });
+
+        final QuerySnapshot numberOfUsers1 = await Firestore.instance.collection('vehicle').getDocuments();
+        final List<DocumentSnapshot> dcmnts =  numberOfUsers1.documents;
+
+        print("user car documnet id: ${dcmnts[dcmnts.length - 1].documentID}");
+
+        globals.userCarDocumentId.add(dcmnts[dcmnts.length - 1].documentID);
+        globals.vehicleName.add(nameController.text);
+        globals.vehicleYear.add(yearval);
+        globals.vehicleNote.add("");
+        globals.vehicleTransmission.add(transVal);
+        globals.vehicleTC.add(trkVal);
+        globals.vehicleTS.add("");
+        globals.vehicleTP.add("");
+        globals.vehicleSubModel.add("");
+        globals.vehicleModel.add("");
+        globals.vehicleType.add(typeVal);
+        globals.vehicleMake.add(makerVal);
+        globals.vehicleLP.add("");
+        globals.vehicleIP.add("");
+        globals.vehicleFU.add(fuVal);
+        globals.vehicleFT.add(ftVal);
+        globals.vehicleEngine.add(engVal);
+        globals.vehicleDU.add(duVal);
+        globals.vehicleCountry.add(cntryVal);
+
+        print("All car doucment id: ${globals.userCarDocumentId}");
+
+        Navigator.of(context).pop();
+      }
+      else{
+        _showDiaglog('The Internet connection appears to be offline');
+      }
+    } on PlatformException catch (e) {
+      print("Exception: ${e.toString()}");
+      _showDiaglog('Failed to get connectivity.');
+    }
+}
+
+  /*Future<String> getSWData() async {
     List data;
   List y = [];
   List mk = [];
@@ -289,18 +378,10 @@ print(dct2);
     });
 
     return "Success";
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loadData();
-   // getSWData();
-  }
+  } */
 
   @override
   Widget build(BuildContext context){
-    print(make["Acura"][0]["model1"]);
 
     final nameLbl = Text('Vehicle Name', style: TextStyle(color: Colors.black,fontSize: 18.0),);
     final name = TextFormField(
@@ -318,8 +399,7 @@ print(dct2);
     final typeCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: typeList,
-
-        onChanged: (value){
+          onChanged: (value){
           typeVal = value;
           setState(() {
             print("selected type ${typeVal}");
@@ -332,7 +412,7 @@ print(dct2);
     );
 
     final yearLbl = Text('Year', style: TextStyle(color: Colors.black,fontSize: 18.0),);
-    final dp = DropdownButton(items: yearList,
+    /*final dp = DropdownButton(items: yearList,
       onChanged: (value){
         yearval = value;
         setState(() {
@@ -341,8 +421,7 @@ print(dct2);
       },
       hint: new Text('Select year'),
       value: yearval,
-    );
-
+    );*/
     final yCon = Container(
       /*decoration: BoxDecoration(
         //color: Colors.brown,
@@ -352,8 +431,7 @@ print(dct2);
       ),*/
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: yearList,
-
-        onChanged: (value){
+          onChanged: (value){
           yearval = value;
           setState(() {
             makeMaker();
@@ -370,8 +448,7 @@ print(dct2);
     final mCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: makerList,
-
-        onChanged: (value){
+          onChanged: (value){
           makerVal = value;
           setState(() {
             print("selected maker ${makerVal}");
@@ -399,8 +476,7 @@ print(dct2);
     final engCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: engList,
-
-        onChanged: (value){
+          onChanged: (value){
           engVal = value;
           setState(() {
             print("selected engine ${engVal}");
@@ -416,8 +492,7 @@ print(dct2);
     final transCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: transList,
-
-        onChanged: (value){
+          onChanged: (value){
           transVal = value;
           setState(() {
             print("selected transmission ${transVal}");
@@ -433,8 +508,7 @@ print(dct2);
     final cntryCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: cntryList,
-
-        onChanged: (value){
+          onChanged: (value){
           cntryVal = value;
           setState(() {
             print("selected country ${cntryVal}");
@@ -450,8 +524,7 @@ print(dct2);
     final duCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: duList,
-
-        onChanged: (value){
+          onChanged: (value){
           duVal = value;
           setState(() {
             print("selected distance unit${duVal}");
@@ -467,8 +540,7 @@ print(dct2);
     final fuCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: fuList,
-
-        onChanged: (value){
+          onChanged: (value){
           fuVal = value;
           setState(() {
             print("selected fuel unit ${fuVal}");
@@ -484,8 +556,7 @@ print(dct2);
     final ftCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: ftList,
-
-        onChanged: (value){
+          onChanged: (value){
           ftVal = value;
           setState(() {
             print("selected fuel tracking ${ftVal}");
@@ -501,8 +572,7 @@ print(dct2);
     final trkCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: trkList,
-
-        onChanged: (value){
+          onChanged: (value){
           trkVal = value;
           setState(() {
             print("selected tracking city/ highway ${trkVal}");
@@ -520,12 +590,14 @@ print(dct2);
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: <Widget>[
-          new IconButton(icon: const Icon(Icons.add), onPressed: () async {
+          new IconButton(icon: const Icon(Icons.add), onPressed: () {
+            _onLoading();
+          }),
+          /*
+          * new IconButton(icon: const Icon(Icons.add), onPressed: () async {
             await addVeh();
-            print("${documents}");
             Navigator.of(context).pop();
-          }, tooltip: "Add New vehicle",),
-
+          }),*/
         ],
       ),
       body: Center(

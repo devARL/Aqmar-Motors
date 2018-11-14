@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'globals.dart' as globals;
+import 'package:connectivity/connectivity.dart';
+import 'package:flutter/services.dart';
+import 'dart:async';
 
 class Register extends StatelessWidget {
   @override
@@ -10,7 +13,6 @@ class Register extends StatelessWidget {
 }
 
 class RegisterPage extends StatefulWidget {
-
   @override
   RegisterPageState createState() => new RegisterPageState();
 }
@@ -22,9 +24,19 @@ class RegisterPageState extends State<RegisterPage> {
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
   final cpController = TextEditingController();
+  final Connectivity _connectivity = Connectivity();
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    cpController.dispose();
+    super.dispose();
+  }
 
-  String _validateEmail(String value) {
+/*  String _validateEmail(String value) {
     // If empty value, the isEmail function throw a error.
     // So I changed this function with try and catch.
     try {
@@ -32,10 +44,29 @@ class RegisterPageState extends State<RegisterPage> {
     } catch (e) {
       return 'The E-mail Address must be a valid email address.';
     }
-
     return null;
-  }
+  } */
 
+  void _onLoading() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      child: new Dialog(
+        child: new Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            new CircularProgressIndicator(),
+            new Text("Loading"),
+          ],
+        ),
+      ),
+    );
+    new Future.delayed(new Duration(seconds: 1), () {
+      Navigator.pop(context); //pop dialog
+      //_login();
+      registerBtn();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,11 +141,11 @@ class RegisterPageState extends State<RegisterPage> {
         child: MaterialButton(
           minWidth: 200.0,
           height: 42.0,
-          onPressed: () async {
+          /*onPressed: () async {
             await registerBtn();
-            Navigator.pushReplacementNamed(context, "/welcome");
-            //Navigator.pushReplacementNamed(context, "/welcome");
-            // Navigator.of(context).pushNamed(HomePage.tag);
+          },*/
+          onPressed: () {
+            _onLoading();
           },
           color: Colors.red,
           child: new Row(
@@ -127,7 +158,6 @@ class RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
-
 
     return new Scaffold(
       backgroundColor: Colors.white,
@@ -169,17 +199,6 @@ class RegisterPageState extends State<RegisterPage> {
     );
   }
 
-
-  @override
-  void dispose() {
-    nameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    passwordController.dispose();
-    cpController.dispose();
-    super.dispose();
-  }
-
   void _showDiaglog(String txt) {
     showDialog(
       context: context,
@@ -188,9 +207,6 @@ class RegisterPageState extends State<RegisterPage> {
           title: new Center(
             child: new Text("Alert"),
           ),
-          /*content: new Center(
-              child: new Text("Incorrect or blank email"),
-            ),*/
           content: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -201,13 +217,11 @@ class RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
-
                   ),
                 ),
               )
             ],
           ),
-
           actions: <Widget>[
             new FlatButton(
               child: new Text("OK"),
@@ -221,7 +235,7 @@ class RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Future<Null> registerBtn() async {
+  void registerBtn() async {
     if(nameController.text == ''){
       _showDiaglog('blank name');
     }
@@ -243,32 +257,66 @@ class RegisterPageState extends State<RegisterPage> {
       _showDiaglog('password did not match');
     }
     else{
-      final QuerySnapshot numberOfUsers = await Firestore.instance.collection('user').getDocuments();
-      var list = numberOfUsers.documents;
-      print('length: ${list.length}');
-      print('length + 1 ${list.length + 1}');
+      String connectionStatus;
+      try {
+        connectionStatus = (await _connectivity.checkConnectivity()).toString();
+        if(connectionStatus == "ConnectivityResult.wifi" || connectionStatus == "ConnectivityResult.mobile") {
 
-      Firestore.instance.runTransaction((Transaction transaction) async {
-        CollectionReference reference =
-        Firestore.instance.collection('user');
-        await reference.add({"id": list.length + 1, "name": nameController.text, "email": emailController.text, "phone_number": phoneController.text, "password": passwordController.text, "carAdded": 0});
-      });
+          globals.userCarDocumentId.clear();
+          globals.vehicleName.clear();
+          globals.vehicleYear.clear();
+          globals.vehicleNote.clear();
+          globals.vehicleTransmission.clear();
+          globals.vehicleTC.clear();
+          globals.vehicleTS.clear();
+          globals.vehicleTP.clear();
+          globals.vehicleSubModel.clear();
+          globals.vehicleModel.clear();
+          globals.vehicleType.clear();
+          globals.vehicleMake.clear();
+          globals.vehicleLP.clear();
+          globals.vehicleIP.clear();
+          globals.vehicleFU.clear();
+          globals.vehicleFT.clear();
+          globals.vehicleEngine.clear();
+          globals.vehicleCountry.clear();
+          globals.vehicleDU.clear();
+          globals.userCarServiceId.clear();
+          globals.userServiceId.clear();
 
-      //print("length: ${n}");
+          final QuerySnapshot numberOfUsers = await Firestore.instance.collection('user').getDocuments();
+          var list = numberOfUsers.documents;
+          print('length: ${list.length}');
+          print('length + 1 ${list.length + 1}');
 
-      /*     nameController.text = "";
-      emailController.text = "";
-      phoneController.text = "";
-      passwordController.text = "";
-      cpController.text = "";
-*/
-      print('name: ${nameController.text}');
-      print('emailL: ${emailController.text}');
-      print('phone number: ${phoneController.text}');
-      print('password: ${passwordController.text}');
-      print('confirm password: ${cpController.text}');
+          Firestore.instance.runTransaction((Transaction transaction) async {
+            CollectionReference reference =
+            Firestore.instance.collection('user');
+            await reference.add({"id": list.length + 1, "name": nameController.text, "email": emailController.text, "phone_number": phoneController.text,
+              "password": passwordController.text,
+              "carAdded": 0});
+          });
 
+          final QuerySnapshot numberOfUsers1 = await Firestore.instance.collection('user').getDocuments();
+          final List<DocumentSnapshot> dcmnts =  numberOfUsers1.documents;
 
+          globals.userDocumentId = dcmnts[dcmnts.length - 1].documentID;
+
+          globals.userId = list.length + 1;
+          globals.carAdded = 0;
+          globals.userName = nameController.text;
+          globals.userEmail = emailController.text;
+
+          Navigator.pushReplacementNamed(context, "/welcome");
+
+        }
+        else{
+          _showDiaglog('The Internet connection appears to be offline');
+        }
+      } on PlatformException catch (e) {
+        print("Exception: ${e.toString()}");
+        _showDiaglog('Failed to get connectivity.');
+      }
     }
   }
 }

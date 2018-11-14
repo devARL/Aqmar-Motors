@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:aqmar_motors/editVehicle.dart';
+import 'package:aqmar_motors/addService.dart';
 import 'globals.dart' as globals;
 
 class VehicleDetail extends StatelessWidget {
@@ -23,7 +24,6 @@ class VD extends StatefulWidget {
 }
 
 class VDState extends State<VD> {
-
   VDState(this.indx);
 
   String nameVal = null;
@@ -50,7 +50,6 @@ class VDState extends State<VD> {
   @override
   void initState() {
     super.initState();
-    //print("updated vehicle name: ${globals.vehicleName[indx].toString()}");
     nameVal = globals.vehicleName[indx].toString();
     yearval = globals.vehicleYear[indx].toString();
     typeVal = globals.vehicleType[indx].toString();
@@ -75,8 +74,6 @@ class VDState extends State<VD> {
     @override
   Widget build(BuildContext context) {
 
-        print("updated vehicle name: ${globals.vehicleName[indx].toString()}");
-
       return new Scaffold(
         appBar: new AppBar(
           title: new Text('Vehicle Info'),
@@ -89,63 +86,60 @@ class VDState extends State<VD> {
           child: new ListTile(title: Text('Edit Vehicle'), leading: new IconButton(icon: const Icon(Icons.edit), onPressed: () {
 
             Navigator.pop(context);
-
             Navigator.pushReplacement(context, new MaterialPageRoute(
               builder: (BuildContext context) => new EditVehicle(indx),
             ));
-
-            /*Navigator.push(context, new MaterialPageRoute(
-              builder: (BuildContext context) => new EditVehicle(nameVal,yearval,typeVal,cntryVal,duVal,engVal,ftVal,fuVal,ipVal,lpVal,makerVal,modelVal,
-                  noteVal,submodelVal,tpVal,tsVal,trkVal,transVal,carDocumentId,indx),
-            ));*/
-
          }),onTap: () {
             Navigator.pop(context);
 
             Navigator.pushReplacement(context, new MaterialPageRoute(
               builder: (BuildContext context) => new EditVehicle(indx),
             ));
-
-            /*Navigator.push(context, new MaterialPageRoute(
-              builder: (BuildContext context) => new EditVehicle(nameVal,yearval,typeVal,cntryVal,duVal,engVal,ftVal,fuVal,ipVal,lpVal,makerVal,modelVal,
-                  noteVal,submodelVal,tpVal,tsVal,trkVal,transVal,carDocumentId,indx),
-            ));*/
-          },),
+            },),
         ),
 
         new PopupMenuItem<String>(
           child: new ListTile(title: Text('Add Fuel'), leading: new IconButton(icon: const Icon(Icons.local_gas_station), onPressed: () {
-            Navigator.pushNamed(context, "/addVehicle");
+            //Navigator.pushNamed(context, "/addVehicle");
           }),onTap: () {
-            Navigator.pushNamed(context, "/addVehicle");
+           // Navigator.pushNamed(context, "/addVehicle");
           },)),
 
       new PopupMenuItem<String>(
           child: new ListTile(title: Text('Add Service'), leading: new IconButton(icon: const Icon(Icons.build), onPressed: () {
-            Navigator.pushNamed(context, "/addVehicle");
+
+            Navigator.pop(context);
+            Navigator.pushReplacement(context, new MaterialPageRoute(
+              builder: (BuildContext context) => new AddService(indx),
+            ));
           }),onTap: () {
-            Navigator.pushNamed(context, "/addVehicle");
+
+            Navigator.pop(context);
+            Navigator.pushReplacement(context, new MaterialPageRoute(
+              builder: (BuildContext context) => new AddService(indx),
+            ));
+
           },)),
 
       new PopupMenuItem<String>(
           child: new ListTile(title: Text('Add Note'), leading: new IconButton(icon: const Icon(Icons.event_note), onPressed: () {
-            Navigator.pushNamed(context, "/addVehicle");
+           // Navigator.pushNamed(context, "/addVehicle");
           }),onTap: () {
-            Navigator.pushNamed(context, "/addVehicle");
+           // Navigator.pushNamed(context, "/addVehicle");
           },)),
 
       new PopupMenuItem<String>(
           child: new ListTile(title: Text('Add Reminder'), leading: new IconButton(icon: const Icon(Icons.alarm), onPressed: () {
-            Navigator.pushNamed(context, "/addVehicle");
+           // Navigator.pushNamed(context, "/addVehicle");
           }),onTap: () {
-            Navigator.pushNamed(context, "/addVehicle");
+           // Navigator.pushNamed(context, "/addVehicle");
           },)),
 
       new PopupMenuItem<String>(
           child: new ListTile(title: Text('Vehicle Logs'), leading: new IconButton(icon: const Icon(Icons.list), onPressed: () {
-            Navigator.pushNamed(context, "/addVehicle");
+           // Navigator.pushNamed(context, "/addVehicle");
           }),onTap: () {
-            Navigator.pushNamed(context, "/addVehicle");
+           // Navigator.pushNamed(context, "/addVehicle");
           },)),
 
       ],
@@ -184,7 +178,6 @@ class VDState extends State<VD> {
               SizedBox(height: 5.0),
               Row(
                 children: [
-
                 Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -319,18 +312,15 @@ class VDState extends State<VD> {
                             fontSize: 15.0
                         ),
                       ),
-
                     ],
                   ),
                 ],
               ),
               new Divider(height: 15.0,color: Colors.grey.shade700,),
               SizedBox(height: 5.0,),
-
             ],
           ),
         ),
       );
-
     }
 }

@@ -5,10 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'globals.dart' as globals;
 
-
 class login extends StatelessWidget {
-
-
   @override
   Widget build(BuildContext context) {
     return new LoginPage(title: "Hello world title",);
@@ -29,44 +26,31 @@ class LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  String _connectionStatus = 'Unknown';
+  //String _connectionStatus = 'Unknown';
   final Connectivity _connectivity = Connectivity();
-  StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  //StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
- /* FlutterTts flutterTts = new FlutterTts();
-
-  Future _speak() async{
-    var result = await flutterTts.speak("Hello World");
-    if (result == 1) setState(() => ttsState = flutterTts.);
-  }
-
-  Future _stop() async{
-    var result = await flutterTts.stop();
-    if (result == 1) setState(() => ttsState = TtsState.stopped);
-  }
-*/
   @override
   void initState() {
     super.initState();
-    initConnectivity();
-    print("Title: ${widget.title}");
+    /*initConnectivity();
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
           setState(() => _connectionStatus = result.toString());
-        });
+        });*/
   }
 
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
-
+    //_connectivitySubscription.cancel();
     super.dispose();
   }
 
-  Future<Null> initConnectivity() async {
+  /*Future<Null> initConnectivity() async {
     String connectionStatus;
     try {
       connectionStatus = (await _connectivity.checkConnectivity()).toString();
+      print("connection status: ${connectionStatus}");
     } on PlatformException catch (e) {
       print(e.toString());
       connectionStatus = 'Failed to get connectivity.';
@@ -77,7 +61,7 @@ class LoginPageState extends State<LoginPage> {
     setState(() {
       _connectionStatus = connectionStatus;
     });
-  }
+  }*/
 
   /*void _select(Choice choice) {
     if (choice.title == "View Vehicle Details") {
@@ -128,8 +112,6 @@ class LoginPageState extends State<LoginPage> {
     });
   }
 
-
-
   void _showDiaglog(String txt) {
     showDialog(
       context: context,
@@ -138,9 +120,6 @@ class LoginPageState extends State<LoginPage> {
           title: new Center(
             child: new Text("Alert"),
           ),
-          /*content: new Center(
-              child: new Text("Incorrect or blank email"),
-            ),*/
           content: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -151,13 +130,11 @@ class LoginPageState extends State<LoginPage> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
-
                   ),
                 ),
               )
             ],
           ),
-
           actions: <Widget>[
             new FlatButton(
               child: new Text("OK"),
@@ -179,118 +156,185 @@ class LoginPageState extends State<LoginPage> {
       _showDiaglog('blank password');
     }
     else {
-      print('email: ${emailController.text}');
-      print('password: ${passwordController.text}');
-      globals.userCarDocumentId.clear();
-      globals.vehicleName.clear();
-      globals.vehicleYear.clear();
-      globals.vehicleNote.clear();
-      globals.vehicleTransmission.clear();
-      globals.vehicleTC.clear();
-      globals.vehicleTS.clear();
-      globals.vehicleTP.clear();
-      globals.vehicleSubModel.clear();
-      globals.vehicleModel.clear();
-      globals.vehicleType.clear();
-      globals.vehicleMake.clear();
-      globals.vehicleLP.clear();
-      globals.vehicleIP.clear();
-      globals.vehicleFU.clear();
-      globals.vehicleFT.clear();
-      globals.vehicleEngine.clear();
-      globals.vehicleCountry.clear();
-      globals.vehicleDU.clear();
 
+      String connectionStatus;
+      try {
+        connectionStatus = (await _connectivity.checkConnectivity()).toString();
+        if (connectionStatus == "ConnectivityResult.wifi" ||
+            connectionStatus == "ConnectivityResult.mobile") {
+          print("connection status: ${connectionStatus}");
 
-/*      final QuerySnapshot numberOfUsers = await Firestore.instance.collection('user').getDocuments();
-      var list = numberOfUsers.documents;
-      print('length: ${list.length}');
+          print('email: ${emailController.text}');
+          print('password: ${passwordController.text}');
+          globals.userCarDocumentId.clear();
+          globals.vehicleName.clear();
+          globals.vehicleYear.clear();
+          globals.vehicleNote.clear();
+          globals.vehicleTransmission.clear();
+          globals.vehicleTC.clear();
+          globals.vehicleTS.clear();
+          globals.vehicleTP.clear();
+          globals.vehicleSubModel.clear();
+          globals.vehicleModel.clear();
+          globals.vehicleType.clear();
+          globals.vehicleMake.clear();
+          globals.vehicleLP.clear();
+          globals.vehicleIP.clear();
+          globals.vehicleFU.clear();
+          globals.vehicleFT.clear();
+          globals.vehicleEngine.clear();
+          globals.vehicleCountry.clear();
+          globals.vehicleDU.clear();
+          globals.userCarServiceId.clear();
+          globals.userServiceId.clear();
 
-
-
-
-      print('List: ${list[0]['email']}');*/
-
-      final QuerySnapshot emailResult = await Firestore.instance
-          .collection('user')
-          .where('email', isEqualTo: emailController.text)
-          .limit(1)
-          .getDocuments();
-
-      final List<DocumentSnapshot> documents = emailResult.documents;
-
-      if (documents.length == 1) {
-        print('password: ${documents[0]['password']}');
-        if (documents[0]['password'] == passwordController.text) {
-          print('password match');
-          emailController.text = "";
-          passwordController.text = "";
-          globals.isLoggedIn = true;
-          globals.userEmail = documents[0]['email'];
-          globals.userName = documents[0]['name'];
-          globals.userId = documents[0]['id'];
-          globals.userDocumentId = documents[0].documentID;
-          globals.carAdded = 0;
-          //globals.carAdded = documents[0]['carAdded'];
-
-
-          final QuerySnapshot vehResult = await Firestore.instance
-              .collection('vehicle')
-              .where('user_id', isEqualTo: globals.userId)
-              .limit(5)
+          print("Fetching User Data");
+          final QuerySnapshot emailResult = await Firestore.instance
+              .collection('user')
+              .where('email', isEqualTo: emailController.text)
+              .limit(1)
               .getDocuments();
-          final List<DocumentSnapshot> docmnts = vehResult.documents;
 
-          for (var i = 0; i < docmnts.length; i++) {
-            globals.userCarDocumentId.add(docmnts[i].documentID);
-            print("user car document id: ${globals.userCarDocumentId[i]}");
-            globals.vehicleName.add(docmnts[i]['name']);
-            globals.vehicleYear.add(docmnts[i]['year']);
-            globals.vehicleNote.add(docmnts[i]['vehicle_note']);
-            globals.vehicleTransmission.add(docmnts[i]['transmission']);
-            globals.vehicleTC.add(docmnts[i]['track_city']);
-            globals.vehicleTS.add(docmnts[i]['tire_size']);
-            globals.vehicleTP.add(docmnts[i]['tire_pressure']);
-            globals.vehicleSubModel.add(docmnts[i]['sub_model']);
-            globals.vehicleModel.add(docmnts[i]['model']);
-            globals.vehicleType.add(docmnts[i]['type']);
-            globals.vehicleMake.add(docmnts[i]['make']);
-            globals.vehicleLP.add(docmnts[i]['license_plate']);
-            globals.vehicleIP.add(docmnts[i]['insurance_policy']);
-            globals.vehicleFU.add(docmnts[i]['fuel_unit']);
-            globals.vehicleFT.add(docmnts[i]['fuel_tracking']);
-            globals.vehicleEngine.add(docmnts[i]['engine']);
-            globals.vehicleDU.add(docmnts[i]['distance_unit']);
-            globals.vehicleCountry.add(docmnts[i]['country']);
-            globals.carAdded += 1;
-          }
-          Navigator.pushReplacementNamed(context, "/welcome");
-        }
-        else{
-          _showDiaglog('password not match');
-        }
-      }
-      else {
-        _showDiaglog('email not exists');
-      }
+          final List<DocumentSnapshot> documents = emailResult.documents;
 
-      /*for(var i = 0; i <  list.length; i++) {
-        if(list[i]['email'] == emailController.text) {
-          if(list[i]['password'] == passwordController.text) {
-            //emailController.text = "";
-            //passwordController.text = "";
-            Navigator.pushReplacementNamed(context, "/welcome");
+          if (documents.length == 1) {
+            if (documents[0]['password'] == passwordController.text) {
+              print('password match');
+              emailController.text = "";
+              passwordController.text = "";
+              globals.isLoggedIn = true;
+              globals.userEmail = documents[0]['email'];
+              globals.userName = documents[0]['name'];
+              globals.userId = documents[0]['id'];
+              globals.userDocumentId = documents[0].documentID;
+              globals.carAdded = documents[0]['carAdded'];
+
+              print("fetching user vehicles");
+              final QuerySnapshot vehResult = await Firestore.instance
+                  .collection('vehicle')
+                  .where('user_id', isEqualTo: globals.userId)
+                  .limit(5)
+                  .getDocuments();
+              final List<DocumentSnapshot> docmnts = vehResult.documents;
+
+              for (var i = 0; i < docmnts.length; i++) {
+                globals.userCarDocumentId.add(docmnts[i].documentID);
+                print("user car document id: ${globals.userCarDocumentId[i]}");
+                globals.vehicleName.add(docmnts[i]['name']);
+                globals.vehicleYear.add(docmnts[i]['year']);
+                globals.vehicleNote.add(docmnts[i]['vehicle_note']);
+                globals.vehicleTransmission.add(docmnts[i]['transmission']);
+                globals.vehicleTC.add(docmnts[i]['track_city']);
+                globals.vehicleTS.add(docmnts[i]['tire_size']);
+                globals.vehicleTP.add(docmnts[i]['tire_pressure']);
+                globals.vehicleSubModel.add(docmnts[i]['sub_model']);
+                globals.vehicleModel.add(docmnts[i]['model']);
+                globals.vehicleType.add(docmnts[i]['type']);
+                globals.vehicleMake.add(docmnts[i]['make']);
+                globals.vehicleLP.add(docmnts[i]['license_plate']);
+                globals.vehicleIP.add(docmnts[i]['insurance_policy']);
+                globals.vehicleFU.add(docmnts[i]['fuel_unit']);
+                globals.vehicleFT.add(docmnts[i]['fuel_tracking']);
+                globals.vehicleEngine.add(docmnts[i]['engine']);
+                globals.vehicleDU.add(docmnts[i]['distance_unit']);
+                globals.vehicleCountry.add(docmnts[i]['country']);
+              }
+
+              print("fetching user vehicle services");
+
+              final QuerySnapshot servResult = await Firestore.instance
+                  .collection('service')
+                  .where('user_id', isEqualTo: globals.userId)
+                  .getDocuments();
+              final List<DocumentSnapshot> docmntsServ = servResult.documents;
+
+              var servId = [];
+              var arr = [];
+              var userCarDocID = "";
+
+              for (var i = 0; i < docmntsServ.length; i++) {
+                if(docmntsServ.length == 1){
+                  arr.add(docmntsServ[i]['vehicle_name']);
+                  arr.add(docmntsServ[i]['odometer']);
+                  arr.add(docmntsServ[i]['total_cost']);
+                  arr.add(docmntsServ[i]['date']);
+                  arr.add(docmntsServ[i]['time']);
+                  arr.add(docmntsServ[i]['service_name']);
+                  arr.add(docmntsServ[i]['location']);
+                  arr.add(docmntsServ[i]['note']);
+                  globals.userServiceId[docmntsServ[i].documentID] = arr;
+                  servId.add(docmntsServ[i].documentID);
+                  globals.userCarServiceId[docmntsServ[i]['user_car_document_id']] = servId;
+                }
+                else {
+                  if (i == 0) {
+                    servId.add(docmntsServ[i].documentID);
+                    arr.add(docmntsServ[i]['vehicle_name']);
+                    arr.add(docmntsServ[i]['odometer']);
+                    arr.add(docmntsServ[i]['total_cost']);
+                    arr.add(docmntsServ[i]['date']);
+                    arr.add(docmntsServ[i]['time']);
+                    arr.add(docmntsServ[i]['service_name']);
+                    arr.add(docmntsServ[i]['location']);
+                    arr.add(docmntsServ[i]['note']);
+                    userCarDocID = docmntsServ[i]['user_car_document_id'];
+                    globals.userServiceId[docmntsServ[i].documentID] = arr;
+                    }
+                    else {
+                      if (docmntsServ[i]['user_car_document_id'] ==
+                        userCarDocID) {
+                      arr.clear();
+                      servId.add(docmntsServ[i].documentID);
+                      arr.add(docmntsServ[i]['vehicle_name']);
+                      arr.add(docmntsServ[i]['odometer']);
+                      arr.add(docmntsServ[i]['total_cost']);
+                      arr.add(docmntsServ[i]['date']);
+                      arr.add(docmntsServ[i]['time']);
+                      arr.add(docmntsServ[i]['service_name']);
+                      arr.add(docmntsServ[i]['location']);
+                      arr.add(docmntsServ[i]['note']);
+                      globals.userServiceId[docmntsServ[i].documentID] = arr;
+                      }
+                      else {
+                      globals.userCarServiceId[userCarDocID] = servId;
+                      servId.clear();
+                      userCarDocID = docmntsServ[i]['user_car_document_id'];
+                      arr.clear();
+                      arr.add(docmntsServ[i]['vehicle_name']);
+                      arr.add(docmntsServ[i]['odometer']);
+                      arr.add(docmntsServ[i]['total_cost']);
+                      arr.add(docmntsServ[i]['date']);
+                      arr.add(docmntsServ[i]['time']);
+                      arr.add(docmntsServ[i]['service_name']);
+                      arr.add(docmntsServ[i]['location']);
+                      arr.add(docmntsServ[i]['note']);
+                      servId.add(docmntsServ[i].documentID);
+                      globals.userServiceId[docmntsServ[i].documentID] = arr;
+                      }
+                    }
+                  }
+              }
+
+              print("user car documnet ids: ${globals.userCarDocumentId}");
+              print("user service ids: ${globals.userServiceId}");
+              print("user car service ids: ${globals.userCarServiceId}");
+              Navigator.pushReplacementNamed(context, "/welcome");
+            }
+            else{
+              _showDiaglog('password not match');
+            }
           }
           else {
-            //emailController.text = "";
-            //passwordController.text = "";
-            _showDiaglog('password not match');
+            _showDiaglog('email not exists');
           }
         }
-      }*/
-      //emailController.text = "";
-      //passwordController.text = "";
-      //_showDiaglog('email not exists');
+        else {
+          _showDiaglog('The Internet connection appears to be offline');
+        }
+      } on PlatformException catch (e) {
+        print("Exception: ${e.toString()}");
+        _showDiaglog('Failed to get connectivity.');
+      }
     }
   }
 
@@ -361,11 +405,6 @@ class LoginPageState extends State<LoginPage> {
     );
 
     final forgotLabel = FlatButton(
-      /*child: Text('${_connectionStatus}',
-        style: TextStyle(color: Colors.black54,fontSize: 18.0),
-
-      ),
-      */
       child: Text('Forget Password', style: TextStyle(color: Colors.black,fontSize: 18.0),),
       onPressed: () {
         Navigator.pushNamed(context, "/forgetPassword");
@@ -382,12 +421,8 @@ class LoginPageState extends State<LoginPage> {
           minWidth: 200.0,
           height: 42.0,
           onPressed: () {
-            //new Page1();
             Navigator.pushNamed(context, "/register");
-
-            // Navigator.pushReplacementNamed(context, "/welcome");
-            // Navigator.of(context).pushNamed(HomePage.tag);
-          },
+         },
           color: Colors.red,
           child: new Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -422,57 +457,5 @@ class LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-
-    /*return new Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: ListView(
-          shrinkWrap: false,
-          padding: EdgeInsets.only(left: 24.0,right: 24.0),
-          children: <Widget>[
-            logo,
-            SizedBox(height: 5.0,),
-            email,
-            SizedBox(height: 8.0,),
-            password,
-            SizedBox(height: 10.0,),
-            loginBtn,
-            SizedBox(height: 0.0,),
-            forgetBtn,
-            SizedBox(height: 0.0,),
-            registerBtn
-          ],
-        ),
-      ),
-      /*appBar: new AppBar(
-        backgroundColor: Colors.red,
-        title: new Text(widget.title),
-        //title: new Image.asset('assets/302*480.jpg',fit: BoxFit.cover),
-          centerTitle: true,
-        //leading: new IconButton(icon: const Icon(Icons.line_weight), onPressed: () {}),
-        /*actions: <Widget>[
-          //new IconButton(icon: const Icon(Icons.), onPressed: () {}),
-         new PopupMenuButton<Choice>(
-             itemBuilder: (BuildContext context) {
-                return choices.map((Choice choice) {
-                      return PopupMenuItem<Choice>(
-                        value: choice,
-                        //child: Text(choice.title),
-                        //child: new IconButton(icon: Icon(choice.icon), onPressed: null),
-                        child: Row(
-                          children: <Widget>[
-                            new IconButton(icon: Icon(choice.icon), onPressed: () {}, color: choice.color,),
-                            Text(choice.title),
-                          ],
-                        ),
-                      );
-                }).toList();
-          },
-           onSelected: _select,
-          ),
-        ],*/
-        */
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );*/
   }
 }

@@ -7,6 +7,14 @@ String userName = "";
 String userEmail = "";
 String userDocumentId = "";
 var userCarDocumentId = [];
+
+var s = [
+{1 : []},{2: []}
+];
+
+var userServiceId = new Map();
+var userCarServiceId = new Map();
+
 var vehicleName = [];
 var vehicleCountry = [];
 var vehicleDU = [];

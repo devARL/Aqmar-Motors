@@ -2,70 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'globals.dart' as globals;
 import 'package:aqmar_motors/vehicleDetail.dart';
-
+import 'package:connectivity/connectivity.dart';
+import 'package:flutter/services.dart';
 
 class EditVehicle extends StatelessWidget {
   EditVehicle(this.indx);
-/*  EditVehicle(this.name,this.year,this.type,this.country,this.distanceUnit,this.engine,this.fuelTracking,
-      this.fuelUnit,this.insurancePolicy,this.licensePlate,this.make,this.model,this.note,this.subModel,this.tirePressure,
-      this.tireSize,this.trackCity,this.transmission,this.carDocumentId,this.indx);*/
-
-  /*final String name;
-  final String country;
-  final String type;
-  final String distanceUnit;
-  final String engine;
-  final String fuelTracking;
-  final String fuelUnit;
-  final String insurancePolicy;
-  final String licensePlate;
-  final String make;
-  final String model;
-  final String subModel;
-  final String tirePressure;
-  final String tireSize;
-  final String trackCity;
-  final String transmission;
-  final String note;
-  final String year;
-  final String carDocumentId;*/
   final int indx;
 
   @override
   Widget build(BuildContext context) {
     return new EV(indx: indx,);
-/*    return new EV(name: name,type: type, year: year, transmission: transmission, trackCity: trackCity, tireSize: tireSize, tirePressure: tirePressure,
-      subModel: subModel, note: note, model: model, licensePlate: licensePlate, insurancePolicy: insurancePolicy, fuelUnit: fuelUnit, fuelTracking: fuelTracking,
-      engine: engine, distanceUnit: distanceUnit, country: country,carDocumentId: carDocumentId,indx: indx,);*/
-  }
+ }
 }
 
 class EV extends StatefulWidget {
   EV({Key key, this.indx}) : super(key: key);
-
-/*  EV({Key key, this.name, this.type, this.year,this.transmission,this.trackCity,this.tireSize,this.tirePressure,this.subModel,
-    this.note,this.model,this.make,this.licensePlate,this.insurancePolicy,this.fuelUnit,this.fuelTracking,this.engine,
-    this.distanceUnit,this.country,this.carDocumentId,this.indx}) : super(key: key);*/
-
-/*  final String name;
-  final String country;
-  final String type;
-  final String distanceUnit;
-  final String engine;
-  final String fuelTracking;
-  final String fuelUnit;
-  final String insurancePolicy;
-  final String licensePlate;
-  final String make;
-  final String model;
-  final String subModel;
-  final String tirePressure;
-  final String tireSize;
-  final String trackCity;
-  final String transmission;
-  final String note;
-  final String year;
-  final String carDocumentId;*/
   final int indx;
 
   @override
@@ -74,8 +25,6 @@ class EV extends StatefulWidget {
 
 class EVState extends State<EV> {
   EVState(this.indx);
-/*  EVState(this.yearval,this.nameVal,this.makerVal,this.typeVal,this.engVal,this.transVal,this.cntryVal,this.duVal,this.fuVal,
-      this.ftVal,this.trkVal,this.tsVal,this.tpVal,this.submodelVal,this.modelVal,this.noteVal,this.lpVal,this.ipVal,this.carDocumentId,this.indx);*/
 
   String nameVal = null;
   String yearval = null;
@@ -113,6 +62,8 @@ class EVState extends State<EV> {
   List<DropdownMenuItem<String>> ftList = [];
   List<DropdownMenuItem<String>> trkList = [];
 
+  final Connectivity _connectivity = Connectivity();
+
   List<String> m = ["Acura","Toyata","Suzuki","Honda"];
   List<String> y = ["2000","2001","2002","2003","2004","2005","2006","2007",
   "2008","2009","2010","2011","2012","2013","2014","2015","2016","2017",
@@ -149,12 +100,66 @@ class EVState extends State<EV> {
     transVal = globals.vehicleTransmission[indx].toString();
     carDocumentId = globals.userCarDocumentId[indx].toString();
 
-
     nameController.text = nameVal;
     loadData();
     // getSWData();
   }
 
+  void _onLoading() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      child: new Dialog(
+        child: new Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            new CircularProgressIndicator(),
+            new Text("Loading"),
+          ],
+        ),
+      ),
+    );
+    new Future.delayed(new Duration(seconds: 1), () {
+      Navigator.pop(context); //pop dialog
+      updateVeh();
+    });
+  }
+
+  void _showDiaglog(String txt) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Center(
+            child: new Text("Alert"),
+          ),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children : <Widget>[
+              Expanded(
+                child: Text(
+                  txt,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+              )
+            ],
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   void dispose() {
@@ -162,7 +167,6 @@ class EVState extends State<EV> {
     vinController.dispose();
     super.dispose();
   }
-
 
   void makeMaker(){
     List<String> m = [];
@@ -179,38 +183,54 @@ class EVState extends State<EV> {
     )).toList();
   }
 
-  Future<Null> updateVeh() async {
-    globals.vehicleName[indx] = nameController.text;
-    globals.vehicleYear[indx] = yearval;
-    globals.vehicleType[indx] = typeVal;
-    globals.vehicleCountry[indx] = cntryVal;
-    globals.vehicleDU[indx] = duVal;
-    globals.vehicleEngine[indx] = engVal;
-    globals.vehicleFT[indx] = ftVal;
-    globals.vehicleFU[indx] = fuVal;
-    globals.vehicleIP[indx] = ipVal;
-    globals.vehicleLP[indx] = lpVal;
-    globals.vehicleMake[indx] = makerVal;
-    globals.vehicleModel[indx] = modelVal;
-    globals.vehicleNote[indx] = noteVal;
-    globals.vehicleSubModel[indx] = submodelVal;
-    globals.vehicleTP[indx] = tpVal;
-    globals.vehicleTS[indx] = tsVal;
-    globals.vehicleTC[indx] = trkVal;
-    globals.vehicleTransmission[indx] = transVal;
-    globals.userCarDocumentId[indx] = carDocumentId;
+  void updateVeh() async {
 
-    await Firestore.instance.collection('vehicle').document(carDocumentId).updateData({"country": cntryVal, "distance_unit": duVal, "engine": engVal, "fuel_tracking": ftVal, "fuel_unit": fuVal,
-      "insurance_policy": ipVal, "license_plate": lpVal, "make": makerVal, "type": typeVal, "model": modelVal, "name": nameController.text, "sub_model": submodelVal,
-      "tire_pressure": tpVal, "tire_size": tsVal, "track_city": trkVal, "transmission": transVal, "vehicle_note": noteVal,
-      "vehicle_type": typeVal, "year": yearval, "vin_number": vinController.text});
+    String connectionStatus;
+    try {
+      connectionStatus = (await _connectivity.checkConnectivity()).toString();
+      if (connectionStatus == "ConnectivityResult.wifi" ||
+          connectionStatus == "ConnectivityResult.mobile") {
 
-    print("index: ${indx}");
-print("name4 ${globals.vehicleName[indx]}");
+        globals.vehicleName[indx] = nameController.text;
+        globals.vehicleYear[indx] = yearval;
+        globals.vehicleType[indx] = typeVal;
+        globals.vehicleCountry[indx] = cntryVal;
+        globals.vehicleDU[indx] = duVal;
+        globals.vehicleEngine[indx] = engVal;
+        globals.vehicleFT[indx] = ftVal;
+        globals.vehicleFU[indx] = fuVal;
+        globals.vehicleIP[indx] = ipVal;
+        globals.vehicleLP[indx] = lpVal;
+        globals.vehicleMake[indx] = makerVal;
+        globals.vehicleModel[indx] = modelVal;
+        globals.vehicleNote[indx] = noteVal;
+        globals.vehicleSubModel[indx] = submodelVal;
+        globals.vehicleTP[indx] = tpVal;
+        globals.vehicleTS[indx] = tsVal;
+        globals.vehicleTC[indx] = trkVal;
+        globals.vehicleTransmission[indx] = transVal;
+        globals.userCarDocumentId[indx] = carDocumentId;
 
+        await Firestore.instance.collection('vehicle').document(carDocumentId).updateData({"country": cntryVal, "distance_unit": duVal, "engine": engVal, "fuel_tracking": ftVal, "fuel_unit": fuVal,
+          "insurance_policy": ipVal, "license_plate": lpVal, "make": makerVal, "type": typeVal, "model": modelVal, "name": nameController.text, "sub_model": submodelVal,
+          "tire_pressure": tpVal, "tire_size": tsVal, "track_city": trkVal, "transmission": transVal, "vehicle_note": noteVal,
+          "vehicle_type": typeVal, "year": yearval, "vin_number": vinController.text});
+
+        //print("index: ${indx}");
+        //print("name4 ${globals.vehicleName[indx]}");
+
+        Navigator.pushReplacement(context, new MaterialPageRoute(
+          builder: (BuildContext context) => new VehicleDetail(indx),
+        ));
+      }
+      else{
+        _showDiaglog('The Internet connection appears to be offline');
+      }
+    } on PlatformException catch (e) {
+      print("Exception: ${e.toString()}");
+      _showDiaglog('Failed to get connectivity.');
+    }
   }
-
-
 
   void loadData() {
     yearList = [];
@@ -254,10 +274,8 @@ print("name4 ${globals.vehicleName[indx]}");
       child: new Text(val), value: val,)).toList();
   }
 
-
   @override
   Widget build(BuildContext context) {
-
 
     final nameLbl = Text('Vehicle Name', style: TextStyle(color: Colors.black,fontSize: 18.0),);
     final name = TextFormField(
@@ -275,7 +293,6 @@ print("name4 ${globals.vehicleName[indx]}");
     final typeCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: typeList,
-
         onChanged: (value){
           typeVal = value;
           setState(() {
@@ -289,12 +306,10 @@ print("name4 ${globals.vehicleName[indx]}");
     );
 
     final yearLbl = Text('Year', style: TextStyle(color: Colors.black,fontSize: 18.0),);
-
     final yCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: yearList,
-
-        onChanged: (value){
+      onChanged: (value){
           yearval = value;
           setState(() {
             makeMaker();
@@ -311,7 +326,6 @@ print("name4 ${globals.vehicleName[indx]}");
     final mCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: makerList,
-
         onChanged: (value){
           makerVal = value;
           setState(() {
@@ -340,7 +354,6 @@ print("name4 ${globals.vehicleName[indx]}");
     final engCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: engList,
-
         onChanged: (value){
           engVal = value;
           setState(() {
@@ -357,8 +370,7 @@ print("name4 ${globals.vehicleName[indx]}");
     final transCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: transList,
-
-        onChanged: (value){
+         onChanged: (value){
           transVal = value;
           setState(() {
             print("selected transmission ${transVal}");
@@ -374,7 +386,6 @@ print("name4 ${globals.vehicleName[indx]}");
     final cntryCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: cntryList,
-
         onChanged: (value){
           cntryVal = value;
           setState(() {
@@ -391,8 +402,7 @@ print("name4 ${globals.vehicleName[indx]}");
     final duCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: duList,
-
-        onChanged: (value){
+          onChanged: (value){
           duVal = value;
           setState(() {
             print("selected distance unit${duVal}");
@@ -408,8 +418,7 @@ print("name4 ${globals.vehicleName[indx]}");
     final fuCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: fuList,
-
-        onChanged: (value){
+          onChanged: (value){
           fuVal = value;
           setState(() {
             print("selected fuel unit ${fuVal}");
@@ -425,7 +434,6 @@ print("name4 ${globals.vehicleName[indx]}");
     final ftCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: ftList,
-
         onChanged: (value){
           ftVal = value;
           setState(() {
@@ -442,8 +450,7 @@ print("name4 ${globals.vehicleName[indx]}");
     final trkCon = Container(
       width: MediaQuery.of(context).size.width,
       child: DropdownButton(items: trkList,
-
-        onChanged: (value){
+          onChanged: (value){
           trkVal = value;
           setState(() {
             print("selected tracking city/ highway ${trkVal}");
@@ -461,25 +468,24 @@ print("name4 ${globals.vehicleName[indx]}");
         centerTitle: true,
         backgroundColor: Colors.red,
         leading: new IconButton(icon: const Icon(Icons.cancel), onPressed: () {
-          print("cancel pressed");
           Navigator.pushReplacement(context, new MaterialPageRoute(
             builder: (BuildContext context) => new VehicleDetail(indx),
           ));
-
         }),
         actions: <Widget>[
           new IconButton(icon: const Icon(Icons.update), onPressed: () async {
             isUpdated = true;
-            await updateVeh();
+            _onLoading();
+
+            /*await updateVeh();
             print("updated car document id: ${carDocumentId}");
             //Navigator.of(context).pop();
 
             Navigator.pushReplacement(context, new MaterialPageRoute(
               builder: (BuildContext context) => new VehicleDetail(indx),
             ));
-          }, tooltip: "update Vehicle",),
-
-
+            */
+          }),
         ],
       ),
       body: Center(
@@ -512,7 +518,7 @@ print("name4 ${globals.vehicleName[indx]}");
             SizedBox(height: 5.0,),
             engCon,
             SizedBox(height: 15.0),
-           transLbl,
+            transLbl,
             SizedBox(height: 5.0,),
             transCon,
             SizedBox(height: 15.0),
@@ -540,6 +546,5 @@ print("name4 ${globals.vehicleName[indx]}");
         ),
       ),
     );
-
   }
 }
