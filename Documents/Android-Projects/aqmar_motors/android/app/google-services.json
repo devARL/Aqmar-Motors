@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "378024890404",
+    "firebase_url": "https://aqmar-motors.firebaseio.com",
+    "project_id": "aqmar-motors",
+    "storage_bucket": "aqmar-motors.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378024890404:android:d78fb755aa6f7364",
+        "android_client_info": {
+          "package_name": "com.yourcompany.aqmarmotors"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "378024890404-v8124j6c741bpl7c1rvdfi77m5m80g4n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_1CLPHNlD1yHKGwVNWCZ5h34sOJjTF9Q"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
