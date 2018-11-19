@@ -100,7 +100,8 @@ class LoginPageState extends State<LoginPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             new CircularProgressIndicator(),
-            new Text("Loading"),
+            SizedBox(width: 10.0,),
+            new Text("please wait"),
           ],
         ),
       ),
@@ -187,6 +188,8 @@ class LoginPageState extends State<LoginPage> {
           globals.vehicleDU.clear();
           globals.userCarServiceId.clear();
           globals.userServiceId.clear();
+          globals.userFuelupId.clear();
+          globals.userCarFuelupId.clear();
 
           print("Fetching User Data");
           final QuerySnapshot emailResult = await Firestore.instance
@@ -318,6 +321,98 @@ class LoginPageState extends State<LoginPage> {
               print("user car documnet ids: ${globals.userCarDocumentId}");
               print("user service ids: ${globals.userServiceId}");
               print("user car service ids: ${globals.userCarServiceId}");
+
+
+              final QuerySnapshot fuelupResult = await Firestore.instance
+                  .collection('fuelup')
+                  .where('user_id', isEqualTo: globals.userId)
+                  .getDocuments();
+              final List<DocumentSnapshot> docmntsFuelup = servResult.documents;
+
+              var fuelupId = [];
+              var arr2 = [];
+              var userCarDocId = "";
+
+              for (var i = 0; i < docmntsFuelup.length; i++) {
+                if(docmntsFuelup.length == 1){
+                  arr2.add(docmntsFuelup[i]['vehicle_name']);
+                  arr2.add(docmntsFuelup[i]['odometer']);
+                  arr2.add(docmntsFuelup[i]['cost_per_gallon']);
+                  arr2.add(docmntsFuelup[i]['gallons']);
+                  arr2.add(docmntsFuelup[i]['total_cost']);
+                  arr2.add(docmntsFuelup[i]['date']);
+                  arr2.add(docmntsFuelup[i]['time']);
+                  arr2.add(docmntsFuelup[i]['fuel_type']);
+                  arr2.add(docmntsFuelup[i]['location']);
+                  arr2.add(docmntsFuelup[i]['note']);
+                  arr2.add(docmntsFuelup[i]['partial_fuelup']);
+                  arr2.add(docmntsFuelup[i]['missed_fuelup']);
+                  globals.userFuelupId[docmntsFuelup[i].documentID] = arr2;
+                  fuelupId.add(docmntsFuelup[i].documentID);
+                  globals.userCarFuelupId[docmntsFuelup[i]['user_car_document_id']] = fuelupId;
+                }
+                else {
+                  if (i == 0) {
+                    fuelupId.add(docmntsFuelup[i].documentID);
+                    arr2.add(docmntsFuelup[i]['vehicle_name']);
+                    arr2.add(docmntsFuelup[i]['odometer']);
+                    arr2.add(docmntsFuelup[i]['cost_per_gallon']);
+                    arr2.add(docmntsFuelup[i]['gallons']);
+                    arr2.add(docmntsFuelup[i]['total_cost']);
+                    arr2.add(docmntsFuelup[i]['date']);
+                    arr2.add(docmntsFuelup[i]['time']);
+                    arr2.add(docmntsFuelup[i]['fuel_type']);
+                    arr2.add(docmntsFuelup[i]['location']);
+                    arr2.add(docmntsFuelup[i]['note']);
+                    arr2.add(docmntsFuelup[i]['partial_fuelup']);
+                    arr2.add(docmntsFuelup[i]['missed_fuelup']);
+                    userCarDocId = docmntsFuelup[i]['user_car_document_id'];
+                    globals.userFuelupId[docmntsFuelup[i].documentID] = arr2;
+                  }
+                  else {
+                    if (docmntsFuelup[i]['user_car_document_id'] ==
+                        userCarDocId) {
+                      arr2.clear();
+                      fuelupId.add(docmntsFuelup[i].documentID);
+                      arr2.add(docmntsFuelup[i]['vehicle_name']);
+                      arr2.add(docmntsFuelup[i]['odometer']);
+                      arr2.add(docmntsFuelup[i]['cost_per_gallon']);
+                      arr2.add(docmntsFuelup[i]['gallons']);
+                      arr2.add(docmntsFuelup[i]['total_cost']);
+                      arr2.add(docmntsFuelup[i]['date']);
+                      arr2.add(docmntsFuelup[i]['time']);
+                      arr2.add(docmntsFuelup[i]['fuel_type']);
+                      arr2.add(docmntsFuelup[i]['location']);
+                      arr2.add(docmntsFuelup[i]['note']);
+                      arr2.add(docmntsFuelup[i]['partial_fuelup']);
+                      arr2.add(docmntsFuelup[i]['missed_fuelup']);
+                      globals.userFuelupId[docmntsFuelup[i].documentID] = arr2;
+                    }
+                    else {
+                      globals.userCarFuelupId[userCarDocId] = fuelupId;
+                      fuelupId.clear();
+                      userCarDocId = docmntsFuelup[i]['user_car_document_id'];
+                      arr2.clear();
+                      arr2.add(docmntsFuelup[i]['vehicle_name']);
+                      arr2.add(docmntsFuelup[i]['odometer']);
+                      arr2.add(docmntsFuelup[i]['cost_per_gallon']);
+                      arr2.add(docmntsFuelup[i]['gallons']);
+                      arr2.add(docmntsFuelup[i]['total_cost']);
+                      arr2.add(docmntsFuelup[i]['date']);
+                      arr2.add(docmntsFuelup[i]['time']);
+                      arr2.add(docmntsFuelup[i]['fuel_type']);
+                      arr2.add(docmntsFuelup[i]['location']);
+                      arr2.add(docmntsFuelup[i]['note']);
+                      arr2.add(docmntsFuelup[i]['partial_fuelup']);
+                      arr2.add(docmntsFuelup[i]['missed_fuelup']);
+                      fuelupId.add(docmntsFuelup[i].documentID);
+                      globals.userFuelupId[docmntsFuelup[i].documentID] = arr2;
+                    }
+                  }
+                }
+              }
+
+
               Navigator.pushReplacementNamed(context, "/welcome");
             }
             else{

@@ -56,7 +56,7 @@ class RegisterPageState extends State<RegisterPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             new CircularProgressIndicator(),
-            new Text("Loading"),
+            new Text("please wait"),
           ],
         ),
       ),

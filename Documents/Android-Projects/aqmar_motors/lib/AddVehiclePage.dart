@@ -168,7 +168,7 @@ class AddVehiclePageState extends State<AddVehiclePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             new CircularProgressIndicator(),
-            new Text("Loading"),
+            new Text("saving"),
           ],
         ),
       ),

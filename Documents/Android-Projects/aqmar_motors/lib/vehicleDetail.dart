@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:aqmar_motors/editVehicle.dart';
 import 'package:aqmar_motors/addService.dart';
 import 'globals.dart' as globals;
+import 'package:aqmar_motors/addFuelup.dart';
 
 class VehicleDetail extends StatelessWidget {
   VehicleDetail(this.indx);
@@ -100,9 +101,17 @@ class VDState extends State<VD> {
 
         new PopupMenuItem<String>(
           child: new ListTile(title: Text('Add Fuel'), leading: new IconButton(icon: const Icon(Icons.local_gas_station), onPressed: () {
-            //Navigator.pushNamed(context, "/addVehicle");
+
+            Navigator.pop(context);
+            Navigator.pushReplacement(context, new MaterialPageRoute(
+              builder: (BuildContext context) => new AddFuelup(indx),
+            ));
           }),onTap: () {
-           // Navigator.pushNamed(context, "/addVehicle");
+
+            Navigator.pop(context);
+            Navigator.pushReplacement(context, new MaterialPageRoute(
+              builder: (BuildContext context) => new AddFuelup(indx),
+            ));
           },)),
 
       new PopupMenuItem<String>(

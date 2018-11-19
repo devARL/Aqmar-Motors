@@ -114,7 +114,7 @@ class EVState extends State<EV> {
           mainAxisSize: MainAxisSize.min,
           children: [
             new CircularProgressIndicator(),
-            new Text("Loading"),
+            new Text("saving"),
           ],
         ),
       ),

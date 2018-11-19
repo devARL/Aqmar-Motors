@@ -54,8 +54,8 @@ class ASState extends State<AS> {
 
   DateTime _date = new DateTime.now();
   TimeOfDay _time = new TimeOfDay.now();
-
   String carDocumentId = null;
+
 
   var tm = "";
   var dt = "";
@@ -92,7 +92,7 @@ class ASState extends State<AS> {
           mainAxisSize: MainAxisSize.min,
           children: [
             new CircularProgressIndicator(),
-            new Text("Loading"),
+            new Text("saving"),
           ],
         ),
       ),

@@ -15,6 +15,9 @@ var s = [
 var userServiceId = new Map();
 var userCarServiceId = new Map();
 
+var userFuelupId = new Map();
+var userCarFuelupId = new Map();
+
 var vehicleName = [];
 var vehicleCountry = [];
 var vehicleDU = [];
